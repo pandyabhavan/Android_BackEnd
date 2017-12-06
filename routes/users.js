@@ -20,7 +20,7 @@ router.post('/login',function (req,res) {
         {
             if(results.length > 0)
             {
-                    res.send({"status":"200","data":results})
+                res.send({"status":"200","data":results[0]})
             }
             else
             {
