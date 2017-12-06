@@ -14,17 +14,17 @@ router.post('/login',function (req,res) {
         if(err)
         {
             console.log('in error');
-            res.send({"status":"401","data":null});
+            res.send({"status":"401","data":err});
         }
         else
         {
             if(results.length > 0)
             {
-                    res.send({"status":"200","data":results[0]})
+                    res.send({"status":"200","data":results})
             }
             else
             {
-                res.send({"status":"401","data":null})
+                res.send({"status":"401","data":results})
             }
         }
     },query);
