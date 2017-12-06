@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var users = [];
+var fs = require('fs');
 users = require('../users.json');
 
 /* GET users listing. */
@@ -25,6 +26,7 @@ router.post('/login',function (req,res) {
 router.post('/register',function (req,res) {
     console.log(req.body);
     users.push(req.body);
+    fs.writeFile('users.json', JSON.stringify(users));
     res.send({"status":"200","data":req.body});
 });
 
