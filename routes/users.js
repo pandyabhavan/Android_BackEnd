@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 
 
 router.post('/login',function (req,res) {
-    var query = "select * from user where email='"+req.body.email+"')";
+    var query = "select * from user where email='"+req.body.email+"' and password='"+req.body.password+"'";
     mysql.fetchData(function(err,results){
         if(err)
         {
@@ -20,14 +20,7 @@ router.post('/login',function (req,res) {
         {
             if(results.length > 0)
             {
-                if(password == results[0].password)
-                {
                     res.send({"status":"200","data":results[0]})
-                }
-                else
-                {
-                    res.send({"status":"401","data":null})
-                }
             }
             else
             {
