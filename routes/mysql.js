@@ -2,7 +2,7 @@ var mysql = require('mysql');
 
 function getConnection(){
 	var connection = mysql.createConnection({
-		host     : 'http://library.c6ayadrbxmzl.us-west-1.rds.amazonaws.com',
+		host     : 'library.c6ayadrbxmzl.us-west-1.rds.amazonaws.com',
 		user     : 'master',
 		password : 'master123',
 		database : 'library',
