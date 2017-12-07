@@ -3,6 +3,10 @@ var router = express.Router();
 var mysql = require('./mysql');
 var mail = require('./mail');
 
+var nodemailer = require('nodemailer');
+var smtpTransport = require('nodemailer-smtp-transport');
+
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
     res.send('respond with a resource');
@@ -89,6 +93,32 @@ router.post('/verify',function (req,res) {
             res.send({"status":"200","data":res_data});
         }
     },query);
+});
+
+router.post('/sendMail',function (req,res) {
+    var transporter = nodemailer.createTransport(smtpTransport({
+        service: 'gmail',
+        auth: {
+            user: 'pandyabhavan134@gmail.com',
+            pass: 'impoSSible'
+        }
+    }));
+
+    var mailOptions = {
+        from: 'pandyabhavan134@gmail.com',
+        to: "bhavannkumar.pandya@sjsu.edu",
+        subject: 'subject',
+        text: 'text'
+    };
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+            res.send(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+            res.send(info.response);
+        }
+    });
 });
 
 module.exports = router;

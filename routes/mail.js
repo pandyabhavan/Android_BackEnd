@@ -23,7 +23,7 @@ function sendEmail(to,subject,text) {
             return error;
         } else {
             console.log('Email sent: ' + info.response);
-            return true;
+            return info.response;
         }
     });
 }
