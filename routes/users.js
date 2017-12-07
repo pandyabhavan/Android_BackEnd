@@ -45,7 +45,7 @@ router.post('/register',function (req,res) {
     mysql.fetchData(function(err,results){
         if(err)
         {
-            res.send({"status":"401","data":null});
+            res.send({"status":"401","data":err});
         }
         else
         {
@@ -58,7 +58,7 @@ router.post('/register',function (req,res) {
                 mysql.fetchData(function(err,results){
                     if(err)
                     {
-                        res.send({"status":"401","data":null});
+                        res.send({"status":"401","data":err});
                     }
                     else
                     {
