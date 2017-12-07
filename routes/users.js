@@ -41,8 +41,10 @@ router.post('/register',function (req,res) {
         {
             if(results.length == 0)
             {
-                if(req.body.email.includes(""))
-                var query1 = "insert into user values('"+req.body.email+"','"+req.body.password+"','"+req.body.university+"');";
+                var type = "patron";
+                if(req.body.email.includes("@sjsu.edu"))
+                    type="librarian";
+                var query1 = "insert into user values('"+req.body.email+"','"+req.body.password+"','"+req.body.university+"',false,'"+type+"');";
                 mysql.fetchData(function(err,results){
                     if(err)
                     {
@@ -63,5 +65,19 @@ router.post('/register',function (req,res) {
         }
     },query);
 });
+
+router.post('/verify',function (req,res) {
+    var query = "update user set verified=true where email='"+req.body.email+"'";
+    mysql.fetchData(function(err,results) {
+        if (err) {
+            res.send({"status": "401", "data": null});
+        }
+        else {
+            mail.sendEmail(req.body.email,'Verification Completed','Congratulations!! \n Your account is now verified');
+            res.send({"status":"200"});
+        }
+    },query);
+});
+
 
 module.exports = router;
