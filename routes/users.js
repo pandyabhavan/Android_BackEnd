@@ -20,7 +20,7 @@ router.post('/login',function (req,res) {
         {
             if(results.length > 0)
             {
-                var query1 = "select book_id from checkout where user_id='"+req.body.email+"'";
+                var query1 = "select book_id,return_date from checkout where user_id='"+req.body.email+"'";
                 mysql.fetchData(function(err,results1) {
                     if (err) {
                         console.log('in error');
@@ -66,9 +66,9 @@ router.post('/register',function (req,res) {
                         var verification_code = Math.floor(Math.random()*10000);
                         if(verification_code < 1000)
                             verification_code += 1000;
-                        mail.sendEmail(req.body.email,'Registration verfication','Your verification code is:'+verification_code);
+                        var res_data = mail.sendEmail(req.body.email,'Registration verfication','Your verification code is:'+verification_code);
                         req.body["verification_code"] = verification_code;
-                        res.send({"status":"200","data":req.body});
+                        res.send({"status":"200","data":req.body,"mail":res_data});
                     }
                 },query1);
             }
@@ -85,8 +85,8 @@ router.post('/verify',function (req,res) {
             res.send({"status": "401", "data": err});
         }
         else {
-            mail.sendEmail(req.body.email,'Verification Completed','Congratulations!! \n Your account is now verified');
-            res.send({"status":"200"});
+            var res_data = mail.sendEmail(req.body.email,'Verification Completed','Congratulations!! \n Your account is now verified');
+            res.send({"status":"200","data":res_data});
         }
     },query);
 });

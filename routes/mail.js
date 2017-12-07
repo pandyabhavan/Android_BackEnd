@@ -20,8 +20,10 @@ function sendEmail(to,subject,text) {
     transporter.sendMail(mailOptions, function(error, info){
         if (error) {
             console.log(error);
+            return error;
         } else {
             console.log('Email sent: ' + info.response);
+            return true;
         }
     });
 }

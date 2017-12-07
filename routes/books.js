@@ -1,6 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('./mysql');
+var mail = require('./mail');
+
+console.log(new Date().toLocaleDateString());
 
 router.get('/getAll',function (req,res) {
     var query = "select * from book where copies > 0 limit 10";
@@ -12,11 +15,6 @@ router.get('/getAll',function (req,res) {
             res.send({"status":"200","data":results});
         }
     },query);
-});
-
-router.get('/get/:id',function (req,res) {
-    var id = req.params.id;
-
 });
 
 router.post('/add',function (req,res) {
@@ -54,37 +52,74 @@ router.post('/update',function (req,res) {
 });
 
 router.post('/delete/:id',function (req,res) {
-    var query = "delete from book where id="+req.params.id+"";
+    var q = "select count(*) as count from checkout where book_id="+req.params.id+"";
     mysql.fetchData(function(err,results) {
         if (err) {
             res.send({"status": "401", "data": null});
         }
         else {
-            res.send({"status":"200","data":results});
+            if(results[0].count != 0){
+                res.send({"status": "403", "data": null});
+            }
+            else {
+                var query = "delete from book where id="+req.params.id+"";
+                mysql.fetchData(function(err,results) {
+                    if (err) {
+                        res.send({"status": "401", "data": null});
+                    }
+                    else {
+                        res.send({"status":"200","data":results});
+                    }
+                },query);
+            }
         }
-    },query);
+    },q);
 });
 
 router.post('/checkout',function (req,res) {
-    var query1 = "update book set copies=(copies-1) where id="+req.body.id+"";
+    var q = "select checkout_date from checkout where user_id='"+req.body.email+"'";
     mysql.fetchData(function(err,results) {
         if (err) {
             res.send({"status": "401", "data": null});
         }
         else {
-            var now = new Date();
-            now.setDate(now.getDate()+30);
-            var query2 = "insert into checkout values("+req.body.id+",'"+req.body.email+"','"+now+"')";
-            mysql.fetchData(function(err,results) {
-                if (err) {
-                    res.send({"status": "401", "data": null});
+            console.log(JSON.stringify(results));
+            if(results.length >= 9)
+                res.send({"status":"403","data":results});
+            else
+            {
+                var todayCount = 0;
+                for(var i=0;i<results.length;i++){
+                    if(new Date().toLocaleDateString() === (new Date(results[i].checkout_date).toLocaleDateString())){
+                        ++todayCount;
+                    }
                 }
-                else {
-                    res.send({"status":"200","data":results});
+                console.log(todayCount);
+                if(todayCount >= 3){
+                    res.send({"status":"405","data":results});
                 }
-            },query2);
+                var query1 = "update book set copies=(copies-1) where id="+req.body.id+"";
+                mysql.fetchData(function(err,results) {
+                    if (err) {
+                        res.send({"status": "401", "data": null});
+                    }
+                    else {
+                        var now = new Date();
+                        now.setDate(now.getDate()+30);
+                        var query2 = "insert into checkout values("+req.body.id+",'"+req.body.email+"','"+now.toLocaleDateString()+"','"+new Date().toLocaleDateString()+"')";
+                        mysql.fetchData(function(err,results) {
+                            if (err) {
+                                res.send({"status": "401", "data": null});
+                            }
+                            else {
+                                res.send({"status":"200","data":results});
+                            }
+                        },query2);
+                    }
+                },query1);
+            }
         }
-    },query1);
+    },q);
 });
 
 router.post('/return',function (req,res) {
@@ -102,6 +137,7 @@ router.post('/return',function (req,res) {
                     res.send({"status": "401", "data": null});
                 }
                 else {
+                    mail.sendEmail(req.body.email,"Book Returned","Your book returned successfully.");
                     res.send({"status":"200","data":results});
                 }
             },query2);
