@@ -72,7 +72,7 @@ router.post('/register',function (req,res) {
                             verification_code += 1000;
                         var res_data = mail.sendEmail(req.body.email,'Registration verfication','Your verification code is:'+verification_code);
                         req.body["verification_code"] = verification_code;
-                        res.send({"status":"200","data":req.body,"mail":""+res_data});
+                        res.send({"status":"200","data":req.body});
                     }
                 },query1);
             }
@@ -94,31 +94,4 @@ router.post('/verify',function (req,res) {
         }
     },query);
 });
-
-router.post('/sendMail',function (req,res) { 
-    var transporter = nodemailer.createTransport(smtpTransport({
-        service: 'gmail',
-        auth: {
-            user: 'pandyabhavan134@gmail.com',
-            pass: 'impoSSible'
-        }
-    }));
-
-    var mailOptions = {
-        from: 'pandyabhavan134@gmail.com',
-        to: "bhavannkumar.pandya@sjsu.edu",
-        subject: 'subject',
-        text: 'text'
-    };
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-            console.log(error);
-            res.send(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-            res.send(info.response);
-        }
-    });
-});
-
 module.exports = router;
