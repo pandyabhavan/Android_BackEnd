@@ -72,7 +72,7 @@ router.post('/verify',function (req,res) {
     var query = "update user set verified=true where email='"+req.body.email+"'";
     mysql.fetchData(function(err,results) {
         if (err) {
-            res.send({"status": "401", "data": null});
+            res.send({"status": "401", "data": err});
         }
         else {
             mail.sendEmail(req.body.email,'Verification Completed','Congratulations!! \n Your account is now verified');
@@ -80,6 +80,5 @@ router.post('/verify',function (req,res) {
         }
     },query);
 });
-
 
 module.exports = router;

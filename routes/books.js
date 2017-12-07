@@ -53,4 +53,21 @@ router.post('/update',function (req,res) {
     },query);
 });
 
+router.post('/delete/:id',function (req,res) {
+    var query = "delete from book where id="+req.params.id+"";
+    mysql.fetchData(function(err,results) {
+        if (err) {
+            res.send({"status": "401", "data": null});
+        }
+        else {
+            res.send({"status":"200","data":results});
+        }
+    },query);
+});
+
+router.post('/checkout',function (req,res) {
+    var query = "";
+
+});
+
 module.exports = router;
