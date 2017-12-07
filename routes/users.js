@@ -20,7 +20,17 @@ router.post('/login',function (req,res) {
         {
             if(results.length > 0)
             {
-                res.send({"status":"200","data":results[0]})
+                var query1 = "select book_id from checkout where user_id='"+req.body.email+"'";
+                mysql.fetchData(function(err,results1) {
+                    if (err) {
+                        console.log('in error');
+                        res.send({"status": "401", "data": err});
+                    }
+                    else {
+                        results[0].books = results1;
+                        res.send({"status":"200","data":results[0]})
+                    }
+                },query1);
             }
             else
             {
