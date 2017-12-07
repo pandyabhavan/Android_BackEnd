@@ -68,7 +68,7 @@ router.post('/register',function (req,res) {
                             verification_code += 1000;
                         var res_data = mail.sendEmail(req.body.email,'Registration verfication','Your verification code is:'+verification_code);
                         req.body["verification_code"] = verification_code;
-                        res.send({"status":"200","data":req.body,"mail":res_data});
+                        res.send({"status":"200","data":req.body,"mail":""+res_data});
                     }
                 },query1);
             }
