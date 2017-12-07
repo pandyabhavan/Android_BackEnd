@@ -20,13 +20,13 @@ router.get('/get/:id',function (req,res) {
 });
 
 router.post('/add',function (req,res) {
-    var query = "select max(id) from book";
+    var query = "select max(id) as id from book";
     mysql.fetchData(function(err,results) {
         if (err) {
             res.send({"status": "401", "data": err});
         }
         else {
-            var id = Number(results.id)+1;
+            var id = Number(results[0].id)+1;
             console.log(results);
             var query1 = "insert into book values("+id+",'"+req.body.author+"','"+req.body.title+"','"+req.body.call_number+"','"+req.body.publisher+"',"+req.body.publication_year+",'"+req.body.location+"',"+req.body.copies+",'"+req.body.status+"','"+req.body.keywords+"','"+req.body.image+"')";
             mysql.fetchData(function(err,results) {
