@@ -54,6 +54,8 @@ router.post('/register',function (req,res) {
                     {
                         console.log(results);
                         var verification_code = Math.floor(Math.random()*10000);
+                        if(verification_code < 1000)
+                            verification_code += 1000;
                         mail.sendEmail(req.body.email,'Registration verfication','Your verification code is:'+verification_code);
                         req.body["verification_code"] = verification_code;
                         res.send({"status":"200","data":req.body});
