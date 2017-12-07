@@ -42,7 +42,7 @@ router.post('/add',function (req,res) {
 });
 
 router.post('/update',function (req,res) {
-    var query = "update book set author =  '"+req.body.author+"',title = '"+req.body.title+"',call_number = '"+req.body.call_number+"', publisher = '"+req.body.publisher+"',publication_year = "+req.body.publication_year+", location = '"+req.body.location+"', copies = "+req.body.copies+", status = '"+req.body.status+"',keywords = '"+req.body.keywords+"',image = '"+req.body.image+"'where id = "+id+"";
+    var query = "update book set author =  '"+req.body.author+"',title = '"+req.body.title+"',call_number = '"+req.body.call_number+"', publisher = '"+req.body.publisher+"',publication_year = "+req.body.publication_year+", location = '"+req.body.location+"', copies = "+req.body.copies+", status = '"+req.body.status+"',keywords = '"+req.body.keywords+"',image = '"+req.body.image+"'where id = "+req.body.id+"";
     mysql.fetchData(function(err,results) {
         if (err) {
             res.send({"status": "401", "data": null});
