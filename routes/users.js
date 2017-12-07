@@ -94,4 +94,5 @@ router.post('/verify',function (req,res) {
         }
     },query);
 });
+
 module.exports = router;
