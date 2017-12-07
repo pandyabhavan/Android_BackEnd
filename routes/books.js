@@ -3,7 +3,7 @@ var router = express.Router();
 var mysql = require('./mysql');
 
 router.get('/getAll',function (req,res) {
-    var query = "select * from book limit 10";
+    var query = "select * from book where copies > 0 limit 10";
     mysql.fetchData(function(err,results) {
         if (err) {
             res.send({"status": "401", "data": null});
@@ -66,8 +66,47 @@ router.post('/delete/:id',function (req,res) {
 });
 
 router.post('/checkout',function (req,res) {
-    var query = "";
+    var query1 = "update book set copies=(copies-1) where id="+req.body.id+"";
+    mysql.fetchData(function(err,results) {
+        if (err) {
+            res.send({"status": "401", "data": null});
+        }
+        else {
+            var now = new Date();
+            now.setDate(now.getDate()+30);
+            var query2 = "insert into checkout values("+req.body.id+",'"+req.body.email+"','"+now+"')";
+            mysql.fetchData(function(err,results) {
+                if (err) {
+                    res.send({"status": "401", "data": null});
+                }
+                else {
+                    res.send({"status":"200","data":results});
+                }
+            },query2);
+        }
+    },query1);
+});
 
+router.post('/return',function (req,res) {
+    var query1 = "update book set copies=(copies+1) where id="+req.body.id+"";
+    mysql.fetchData(function(err,results) {
+        if (err) {
+            res.send({"status": "401", "data": null});
+        }
+        else {
+            var now = new Date();
+            now.setDate(now.getDate()+30);
+            var query2 = "delete from checkout where book_id = "+req.body.id+" and user_id = '"+req.body.email+"'";
+            mysql.fetchData(function(err,results) {
+                if (err) {
+                    res.send({"status": "401", "data": null});
+                }
+                else {
+                    res.send({"status":"200","data":results});
+                }
+            },query2);
+        }
+    },query1);
 });
 
 module.exports = router;
