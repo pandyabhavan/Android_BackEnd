@@ -18,7 +18,7 @@ router.get('/getAll',function (req,res) {
 });
 
 router.get('/search/:query',function (req,res) {
-    var query = "select * from book where publisher like '%"+req.params.query+"%' or keywords like '%"+req.params.query+"%' or author like '%"+req.params.query+"%' or title like '%"+req.params.query+"%' limit 10";
+    var query = "select * from book where publisher like '%"+req.params.query+"%' or keywords like '%"+req.params.query+"%' or author like '%"+req.params.query+"%' or title like '%"+req.params.query+"%' and copies > 0 limit 10";
     mysql.fetchData(function(err,results) {
         if (err) {
             res.send({"status": "401", "data": null});
