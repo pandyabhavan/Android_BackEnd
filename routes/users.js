@@ -95,7 +95,7 @@ router.post('/verify',function (req,res) {
     },query);
 });
 
-router.post('/sendMail',function (req,res) {
+router.post('/sendMail',function (req,res) { 
     var transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
         auth: {
