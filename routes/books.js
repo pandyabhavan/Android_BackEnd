@@ -121,6 +121,7 @@ router.post('/checkout',function (req,res) {
                         var query2 = "insert into checkout values("+req.body.id+",'"+req.body.email+"','"+now.toLocaleDateString()+"','"+new Date().toLocaleDateString()+"')";
                         mysql.fetchData(function(err,results) {
                             if (err) {
+                                mail.sendEmail(req.body.email,"Book Returned","You successfully checked out book: Mobile Programming Bible.");
                                 res.send({"status": "401", "data": null});
                             }
                             else {
