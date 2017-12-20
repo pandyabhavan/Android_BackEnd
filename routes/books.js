@@ -3,8 +3,6 @@ var router = express.Router();
 var mysql = require('./mysql');
 var mail = require('./mail');
 
-console.log(new Date().toLocaleDateString());
-
 router.get('/getAll',function (req,res) {
     var query = "select * from book where copies > 0 limit 10";
     mysql.fetchData(function(err,results) {
@@ -74,15 +72,23 @@ router.post('/delete/:id',function (req,res) {
                 res.send({"status": "403", "data": null});
             }
             else {
-                var query = "delete from book where id="+req.params.id+"";
+                var query1 = "delete from waitlist where book_id="+req.params.id+"";
                 mysql.fetchData(function(err,results) {
                     if (err) {
                         res.send({"status": "401", "data": null});
                     }
                     else {
-                        res.send({"status":"200","data":results});
+                        var query = "delete from book where id="+req.params.id+"";
+                        mysql.fetchData(function(err,results) {
+                            if (err) {
+                                res.send({"status": "401", "data": null});
+                            }
+                            else {
+                                res.send({"status":"200","data":results});
+                            }
+                        },query);
                     }
-                },query);
+                },query1);
             }
         }
     },q);
@@ -118,14 +124,23 @@ router.post('/checkout',function (req,res) {
                     else {
                         var now = new Date();
                         now.setDate(now.getDate()+30);
-                        var query2 = "insert into checkout values("+req.body.id+",'"+req.body.email+"','"+now.toLocaleDateString()+"','"+new Date().toLocaleDateString()+"')";
+                        var query2 = "insert into checkout values("+req.body.id+",'"+req.body.email+"','"+now+"','"+new Date()+"',0)";
                         mysql.fetchData(function(err,results) {
                             if (err) {
-                                mail.sendEmail(req.body.email,"Book Returned","You successfully checked out book: Mobile Programming Bible.");
                                 res.send({"status": "401", "data": null});
                             }
                             else {
-                                res.send({"status":"200","data":results});
+                                var query3 = "select * from book where id = "+req.body.id+"";
+                                mysql.fetchData(function (err,results) {
+                                    if(results){
+                                        mail.sendEmail(req.body.email,"Book Checkout","You successfully checked out book with below Details."
+                                        +"\nTitle: "+results[0].title
+                                        +"\nAuthor: "+results[0].author
+                                        +"\nTransaction Date: "+new Date()
+                                        +"\nReturn Date: "+now);
+                                        res.send({"status":"200","data":results});
+                                    }
+                                },query3);
                             }
                         },query2);
                     }
@@ -154,6 +169,58 @@ router.post('/return',function (req,res) {
                     res.send({"status":"200","data":results});
                 }
             },query2);
+        }
+    },query1);
+});
+
+
+router.post('/joinWaitList',function (req,res) {
+    var query1 = "insert into waitlist values("+req.body.id+",'"+req.body.email+"')";
+    mysql.fetchData(function(err,results) {
+        if (err) {
+            res.send({"status": "401", "data": null});
+        }
+        else {
+            res.send({"status":"200","data":results});
+        }
+    },query1);
+});
+
+router.post('/renew',function (req,res) {
+    var query1 = "select * from waitlist where book_id = "+req.body.id+"";
+    mysql.fetchData(function(err,results) {
+        if (err) {
+            res.send({"status": "401", "data": null});
+        }
+        else {
+            if (results.length != 0)
+                res.send({"status": "405", "data": null});
+            else {
+                var query = "select * from checkout where book_id = " + req.body.id + " and user_id = '" + req.body.email + "'";
+                mysql.fetchData(function (err, results) {
+                    if (err) {
+                        res.send({"status": "401", "data": err});
+                    }
+                    else {
+                        if (results.length > 0 && results[0].renew < 2) {
+                            var now = new Date(results[0].return_date);
+                            now.setDate(now.getDate() + 30);
+                            var q = "update checkout set return_date='" + now + "',renew = (renew+1) where book_id = " + req.body.id + " and user_id = '" + req.body.email + "'";
+                            mysql.fetchData(function (err, results) {
+                                if (err) {
+                                    res.send({"status": "401", "data": null});
+                                }
+                                else {
+                                    res.send({"status": "200", "data": results});
+                                }
+                            }, q);
+                        }
+                        else {
+                            res.send({"status": "403", "data": null});
+                        }
+                    }
+                }, query);
+            }
         }
     },query1);
 });
