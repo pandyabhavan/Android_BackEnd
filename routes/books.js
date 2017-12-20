@@ -165,8 +165,32 @@ router.post('/return',function (req,res) {
                     res.send({"status": "401", "data": null});
                 }
                 else {
-                    mail.sendEmail(req.body.email,"Book Returned","Your book returned successfully.");
-                    res.send({"status":"200","data":results});
+                    var query3 = "select * from waitlist where book_id="+req.body.id+"";
+                    mysql.fetchData(function (error,results) {
+                        if(err || results.length == 0){
+                            res.send({"status": "401", "data": null});
+                        }
+                        else{
+                            var query4 = "select * from book where id="+req.body.id+"";
+
+                            mysql.fetchData(function (error,result) {
+                                if (err || results.length == 0) {
+                                    res.send({"status": "401", "data": null});
+                                }
+                                else {
+                                    mysql.fetchData(function (err,results) {
+
+                                    },"update waitlist seet available='"+new Date()+"' where book_id = "+req.body.id+" and user_id = '"+req.body.email+"'");
+                                    mail.sendEmail(results[0].user_id,"Book is now Available!","Your book with \nTitle: "+results[0].title
+                                    +"\nAuthor: "+results[0].author+"\n is now available.");
+                                    mail.sendEmail(req.body.email,"Book Returned","Your book returned successfully."+"\nTitle: "+results[0].title
+                                        +"\nAuthor: "+results[0].author
+                                        +"\nTransaction Date: "+new Date());
+                                    res.send({"status":"200","data":results});
+                                }
+                            },query4);
+                        }
+                    },query3);
                 }
             },query2);
         }
@@ -175,7 +199,7 @@ router.post('/return',function (req,res) {
 
 
 router.post('/joinWaitList',function (req,res) {
-    var query1 = "insert into waitlist values("+req.body.id+",'"+req.body.email+"')";
+    var query1 = "insert into waitlist values("+req.body.id+",'"+req.body.email+"',null)";
     mysql.fetchData(function(err,results) {
         if (err) {
             res.send({"status": "401", "data": null});

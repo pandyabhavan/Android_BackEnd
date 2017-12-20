@@ -95,4 +95,31 @@ router.post('/verify',function (req,res) {
     },query);
 });
 
+router.post('/setDate',function (req,res) {
+    var date = new Date(req.body.date);
+    date.setDate(date.getDate()+5);
+    var query = "select * from waitlist where available is not null";
+    mysql.fetchData(function (err,results) {
+        for(var i = 0;i<results.length;i++){
+            var available = new Date(results[i].available.toString());
+            console.log("available"+ available);
+            if(available < new Date(req.body.date))
+            {
+                mysql.fetchData(function (err,r) {},"delete from waitlist where book_id="+results[i].book_id+" and user_id='"+results[i].user_id+"'");
+            }
+        }
+    },query);
+
+    query = "select * from checkout";
+    mysql.fetchData(function (err,results) {
+        for(var i = 0;i<results.length;i++){
+            if(new Date(results[i].return_date) < date){
+                var days = Math.round((date.getTime() - new Date(results[i].return_date).getTime())/(1000*60*60*24));
+                mail.sendEmail(results[0].user_id,"Book due","Hi there,Your book is due in "+days+" days");
+            }
+        }
+    },query);
+    res.send({"status":200,data:null});
+});
+
 module.exports = router;
