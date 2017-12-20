@@ -4,7 +4,7 @@ var mysql = require('./mysql');
 var mail = require('./mail');
 
 router.get('/getAll',function (req,res) {
-    var query = "select * from book where copies > 0 limit 10";
+    var query = "select * from book limit 10";
     mysql.fetchData(function(err,results) {
         if (err) {
             res.send({"status": "401", "data": null});
